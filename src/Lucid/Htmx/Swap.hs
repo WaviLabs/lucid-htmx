@@ -9,6 +9,7 @@ module Lucid.Htmx.Swap where
 
 import Data.Text (Text, pack)
 import Lucid.Htmx.Render
+import Servant.API (ToHttpApiData(..), FromHttpApiData(..))
 
 -- | <https://htmx.org/attributes/hx-swap/>
 -- The different styles that can be used for swapping in content.
@@ -44,3 +45,20 @@ instance Render Swap where
     AfterEnd -> "afterEnd"
     Delete -> "delete"
     None -> "none"
+
+instance ToHttpApiData Swap where
+  toUrlPiece = render
+
+instance FromHttpApiData Swap where
+  parseUrlPiece = \case
+    "innerHTML" -> Right InnerHTML
+    "outerHTML" -> Right OuterHTML
+    "textContent" -> Right TextContent
+    "beforeBegin" -> Right BeforeBegin
+    "afterBegin" -> Right AfterBegin
+    "beforeEnd" -> Right BeforeEnd
+    "afterEnd" -> Right AfterEnd
+    "delete" -> Right Delete
+    "none" -> Right None
+    t -> Left $ "Could not parse " <> t <> ". Expected a valid Swap"
+
